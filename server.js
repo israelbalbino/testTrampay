@@ -57,7 +57,6 @@ app.post("/webhook/perfectpay", async (req, res) => {
 🔥 NOVA VENDA - Você é TOP  
 
 👤 Cliente: ${maskedCustomer}
-📦 Produto: ${product}
 💰 Valor: R$ ${value}
       `;
 
