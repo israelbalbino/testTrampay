@@ -7,9 +7,18 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
+function maskName(name) {
+  if (!name) return "";
+
+  const firstThree = name.slice(0, 3);
+  const hidden = "*".repeat(Math.max(name.length - 3, 0));
+
+  return firstThree + hidden;
+}
+
 async function sendWhatsApp(message) {
   try {
-   const response =  await axios.post(
+    const response = await axios.post(
       `https://api.w-api.app/v1/message/send-text?instanceId=${process.env.W_API_INSTANCE}`,
       {
         phone: process.env.MY_NUMBER,
@@ -23,7 +32,7 @@ async function sendWhatsApp(message) {
       }
     );
 
-    console.log("Mensagem enviada:",response.data);
+    console.log("Mensagem enviada:", response.data);
   } catch (error) {
     console.log(
       "Erro ao enviar:",
@@ -36,24 +45,21 @@ app.post("/webhook/perfectpay", async (req, res) => {
   try {
     const data = req.body;
 
-   // console.log("Webhook recebido:", data);
-
     if (data?.sale_status_enum_key === "approved") {
       const customer = data.customer.full_name;
+      const maskedCustomer = maskName(customer);
       const product = data.product.name;
       const value = data.sale_amount;
 
-      console.log(customer)
+      console.log(maskedCustomer);
 
       const message = `
 🔥 NOVA VENDA - Você é TOP  
 
-👤 Cliente: ${customer}
+👤 Cliente: ${maskedCustomer}
+📦 Produto: ${product}
 💰 Valor: R$ ${value}
-
       `;
-
-      //console.log(data)
 
       await sendWhatsApp(message);
     }
